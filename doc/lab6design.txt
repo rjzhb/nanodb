@@ -1,0 +1,129 @@
+CS122 Assignment 6 - B+ Tree Indexes - Design Document
+======================================================
+
+A:  Analysis of Implementation
+------------------------------
+
+Given NanoDB's B+ tree implementation, consider a simple schema where an
+index is built against a single integer column:
+
+     CREATE TABLE t (
+         -- An index is automatically built on the id column by NanoDB.
+         id INTEGER PRIMARY KEY,
+         value VARCHAR(20)
+     );
+
+Answer the following questions.
+
+A1.  What is the total size of the index's search-key for the primary-key
+     index, in bytes?  Break down this size into its individual components;
+     be as detailed as possible.  (You don't need to go lower than the
+     byte-level in your answer, but you should show what each byte is a
+     part of.)
+
+A2.  What is the maximum number of search-keys that can be stored in leaf
+     nodes of NanoDB's B+ tree implementation?  You should assume a page-
+     size of 8192 bytes.
+
+A3.  What is the maximum number of keys that can be stored in inner nodes
+     of this particular implementation?  (Recall that every key must have
+     a page-pointer on either side of the key.)
+
+A4.  In this implementation, leaf nodes do not reference the previous
+     leaf, only the next leaf.  When splitting a leaf into two leaves,
+     what is the maximum number of leaf nodes that must be read or written,
+     in order to properly manage the next-leaf pointers?
+
+     If leaves also contained a previous-leaf pointer, what would the
+     answer be instead?
+
+     Make sure to explain your answers.
+
+A5.  In this implementation, nodes do not store a page-pointer to their
+     parent node.  This makes the update process somewhat complicated, as
+     we must save the sequence of page-numbers we traverse as we navigate
+     from root to leaf.  If a node must be split, or if entries are to be
+     relocated from a node to its siblings, the node’s parent-node must
+     be retrieved, and the parent’s contents must be scanned to determine
+     the node’s sibling(s).
+
+     Consider an alternate B+ tree implementation in which every node
+     stores a page-pointer to the node’s parent.  In the case of splitting
+     an inner node, what performance-related differences are there between
+     this alternate representation and the given implementation, where
+     nodes do not record their parents?  Which one would you recommend?
+     Justify your answer.
+
+A6.  It should be obvious how indexes can be used to enforce primary keys,
+     but what role might they play with foreign keys?  For example, given
+     this schema:
+
+     CREATE TABLE t1 (
+         id INTEGER PRIMARY KEY
+     );
+     CREATE TABLE t2 (
+         id INTEGER REFERENCES t1;
+     );
+
+     Why might we want to build an index on t2.id?
+
+A7.  Over time, a B+ tree's pages, its leaf pages in particular, may become
+     severely out of order, causing a significant number of seeks as the
+     leaves are traversed in sequence.  Additionally, some of the blocks
+     within the B+ tree file may be empty.
+
+     An easy mechanism for regenerating a B+ tree file is to traverse the file's
+     tuples in sequential order (i.e. from the leftmost leaf page, through
+     all leaf pages in the file), adding each tuple to a new B+ tree file.
+     The new file may then replace the old file.
+
+     Imagine that this operation is performed on a B+ tree file containing
+     many records, where all records are the same size.  On average, how full
+     will the leaf pages in the newly generated file be?  You can state your
+     answer as a percentage, e.g. "0% full".  Explain your answer.
+
+A8.  Consider a variation of the approach in A7:  Instead of making one pass
+     through the initial B+ tree file, two passes are made.  On the first pass,
+     the 1st, 3rd, 5th, 7th, ... tuples are added to the new file.  Then, on the
+     second pass, the 2nd, 4th, 6th, 8th, ... tuples are added to the new file.
+     On average, how full will the leaf pages in the newly generated file be?
+     Explain your answer.
+
+D:  Extra Credit [OPTIONAL]
+---------------------------
+
+If you implemented any extra-credit tasks for this assignment, describe
+them here.  The description should be like this, with stuff in "<>" replaced.
+(The value i starts at 1 and increments...)
+
+D<i>:  <one-line description>
+
+     <brief summary of what you did, including the specific classes that
+     we should look at for your implementation>
+
+     <brief summary of test-cases that demonstrate/exercise your extra work>
+
+E:  Feedback [OPTIONAL]
+-----------------------
+
+WE NEED YOUR FEEDBACK!  Thoughtful and constructive input will help us to
+improve future versions of the course.  These questions are OPTIONAL, and
+your answers will not affect your grade in any way (including if you hate
+everything about the assignment and databases in general, or Donnie and/or
+the TAs in particular).  Feel free to answer as many or as few of them as
+you wish.
+
+E1.  What parts of the assignment were most time-consuming?  Why?
+
+E2.  Did you find any parts of the assignment particularly instructive?
+     Correspondingly, did any parts feel like unnecessary busy-work?
+
+E3.  Did you particularly enjoy any parts of the assignment?  Were there
+     any parts that you particularly disliked?
+
+E4.  Were there any critical details that you wish had been provided with the
+     assignment, that we should consider including in subsequent versions of
+     the assignment?
+
+E5.  Do you have any other suggestions for how future versions of the
+     assignment can be improved?

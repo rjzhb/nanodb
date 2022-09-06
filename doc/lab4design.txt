@@ -1,0 +1,113 @@
+CS122 Assignment 4 - Join Optimization - Design Document
+========================================================
+
+Fill in answers for all questions based on your team's work on Assignment 4.
+
+A:  Refactoring Your Planner
+----------------------------
+
+A1.  What did you name your planner base-class?  Briefly describe what
+     functionality you migrated into this class.
+
+A2.  Was there any functionality that is common to both your SimplePlanner
+     and your CostBasedJoinPlanner that you left duplicated in the
+     subclasses?  If so, explain your rationale for each part of the
+     duplicated functionality.
+
+B:  Generating Optimal Joins
+----------------------------
+
+B1.  Briefly describe how you generate an "optimal" access to a base table.
+
+B2.  Briefly describe how you decide when it is acceptable to push
+     conjuncts down through an outer join.
+
+B3.  The planner in this assignment is still somewhat limited; for example,
+     we can't push conjuncts down into subqueries.  Using the stores schema,
+     write an example SQL query that includes a subquery, where it would be
+     beneficial to push a conjunct down into the subquery.  (Your planner
+     obviously doesn't need to perform this optimization.)
+
+B4.  Enumerate the situations where you call prepare() on plans being
+     generated.  Since this operation is somewhat expensive, do you
+     see any ways to reduce the number of times you call prepare() in
+     your implementation?
+
+B5.  Given a schema t1(a, c1), t2(a, c2), t3(a, c3), and this SQL query:
+     SELECT * FROM t1 JOIN t2 ON t1.a = t2.a JOIN t3 ON t2.a = t3.a;
+
+     Assume that we are using the simple cost-based join planning strategy
+     described in this assignment.  What issue arises when the planner
+     considers joining the pair of tables t1 and t3 first?  What can be done
+     to resolve this problem?  (Your planner does not have to implement
+     this functionality!)
+
+B6.  Is it possible to end up with unused conjuncts (from the WHERE and ON
+     clauses) after planning joins?  Briefly explain why or why not.
+
+C:  Costing SQL Queries
+-----------------------
+
+After you have loaded the stores-28K.sql data and have analyzed all of
+the tables in that schema, run the following explain operations and paste
+the output from your planner (excluding debug output!).
+
+If there is anything unusual or non-obvious about your output, feel free
+to write explanatory notes after your output.
+
+C1.  EXPLAIN SELECT * FROM cities WHERE population > 5000000;
+
+C2.  EXPLAIN SELECT store_id FROM stores, cities
+     WHERE stores.city_id = cities.city_id AND
+           cities.population > 1000000;
+
+C3.  EXPLAIN SELECT store_id FROM stores JOIN
+                    (SELECT city_id FROM cities
+                     WHERE population > 1000000) AS big_cities
+                    ON stores.city_id = big_cities.city_id;
+
+C4.  EXPLAIN SELECT store_id, property_costs
+     FROM stores, cities, states
+     WHERE stores.city_id = cities.city_id AND
+           cities.state_id = states.state_id AND
+           state_name = 'Oregon' AND property_costs > 500000;
+
+D:  Extra Credit [OPTIONAL]
+---------------------------
+
+If you implemented any extra-credit tasks for this assignment, describe
+them here.  The description should be like this, with stuff in "<>" replaced.
+(The value i starts at 1 and increments...)
+
+D<i>:  <one-line description>
+
+     <brief summary of what you did, including the specific classes that
+     we should look at for your implementation>
+
+     <brief summary of test-cases that demonstrate/exercise your extra work>
+
+E:  Feedback [OPTIONAL]
+-----------------------
+
+WE NEED YOUR FEEDBACK!  Thoughtful and constructive input will help us to
+improve future versions of the course.  These questions are OPTIONAL, and
+your answers will not affect your grade in any way (including if you hate
+everything about the assignment and databases in general, or Donnie and/or
+the TAs in particular).  Feel free to answer as many or as few of them as
+you wish.
+
+E1.  What parts of the assignment were most time-consuming?  Why?
+
+E2.  Did you find any parts of the assignment particularly instructive?
+     Correspondingly, did any parts feel like unnecessary busy-work?
+
+E3.  Did you particularly enjoy any parts of the assignment?  Were there
+     any parts that you particularly disliked?
+
+E4.  Were there any critical details that you wish had been provided with the
+     assignment, that we should consider including in subsequent versions of
+     the assignment?
+
+E5.  Do you have any other suggestions for how future versions of the
+     assignment can be improved?
+

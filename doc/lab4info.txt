@@ -1,0 +1,33 @@
+CS122 Assignment 4 - Join Optimization
+======================================
+
+Please completely fill out this document so that we know who participated on
+the assignment, any late extensions received, and how much time the assignment
+took for your team.  Thank you!
+
+L1.  List your team name and the people who worked on this assignment.
+
+     <team name>
+
+     <name>
+     <name>
+     ...
+
+L2.  Specify the tag and commit-hash of the Git commit you are submitting for
+     your assignment.  (You can list the hashes of all tags with the command
+     "git show-ref --tags".)
+
+     Tag:  <tag>
+     Commit hash:  <hash>
+
+L3.  Specify how many late tokens you are applying to this assignment, if any.
+     Similarly, if your team received an extension from Donnie then please
+     indicate how many days extension you received.  You may leave this blank
+     if it is not relevant to this submission.
+
+     <tokens / extension>
+
+L4.  For each teammate, briefly describe what parts of the assignment each
+     teammate focused on, along with the total hours spent on the assignment.
+
+

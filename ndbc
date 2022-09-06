@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Look for the NanoDB server JAR file in the target directory
+NANODB_SERVER_JAR=`ls target/nanodb-server-*.jar 2>/dev/null`
+if [ -z "$NANODB_SERVER_JAR" ]
+then
+    echo "ERROR: Can't find NanoDB server JAR file.  Run 'mvn package' to build the project."
+    exit 1
+fi
+
+# Check if the sources are out of date and warn the user to rerun 'mvn package'.
+{
+  SOURCE_LAST_MODIFIED="$(find src -type f -exec stat \{\} --printf='%Y\n' \; | sort -n -r | head -n 1)"
+  JAR_LAST_MODIFIED="$(stat $NANODB_SERVER_JAR --printf '%Y\n')"
+
+  if [ -n "$SOURCE_LAST_MODIFIED" -a "$SOURCE_LAST_MODIFIED" -gt "$JAR_LAST_MODIFIED" ]; then
+    echo "WARNING: Your jar file is out of date. Please  re-run 'mvn package' to rebuild the project."
+  fi
+} 2>/dev/null
+
+# To set the page-size to use, add "-Dnanodb.pagesize=2048" to JAVA_OPTS.
+# To enable transaction processing, add "-Dnanodb.txns=on" to JAVA_OPTS.
+JAVA_OPTS="-Dlog4j.configurationFile=log4j2.properties"
+
+# See if we have the rlwrap utility; if so, it makes using NanoDB
+# from the command-line sooo much nicer...
+testrl=$(which rlwrap)
+if [ -z "$testrl" ]
+then
+    java $JAVA_OPTS -cp $NANODB_SERVER_JAR edu.caltech.nanodb.client.SharedServerClient
+else
+    rlwrap java $JAVA_OPTS -cp $NANODB_SERVER_JAR edu.caltech.nanodb.client.SharedServerClient
+fi
+

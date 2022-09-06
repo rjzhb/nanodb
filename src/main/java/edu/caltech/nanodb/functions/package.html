@@ -1,0 +1,56 @@
+<html>
+<body>
+
+<p>
+This package contains the abstractions for supporting simple functions,
+aggregate functions, and table-returning functions in NanoDB.  Additionally,
+this package contains many function implementations to use in SQL queries,
+as well as a {@link FunctionDirectory} for looking up function implementations
+from within the query planning and evaluation code.
+</p>
+
+<p>Here is a brief description of the abstractions implemented in NanoDB.</p>
+
+<ul>
+
+<li>All kinds of functions derive from the abstract {@link Function} base
+    class.</li>
+
+<li>"Simple functions" take zero or more arguments, and produce one result for
+    each set of inputs.  They may be deterministic or nondeterministic, and
+    they may access or maintain state data.  All simple functions derive from
+    the {@link SimpleFunction} class.</li>
+
+<li>"Aggregate functions" take a multiset of inputs, and produce one aggregate
+    result from that multiset of inputs.  Currently, aggregate functions only
+    accept one multiset (e.g. <tt>AVG(n)</tt>).  All aggregate functions
+    derive from the {@link AggregateFunction} class.</li>
+
+<li>Both simple functions and aggregate functions derive from the
+    {@link ScalarFunction} class, since both of them return a single result
+    value, and both can appear in expressions.</li>
+
+<li>"Table functions" take zero or more arguments, and return a result-set of
+    zero or more tuples.  Table functions have an interface similar to the
+    plan-node interface so that tuples can be produced one at a time, and
+    other details such as schema and costing details can be exposed by the
+    function.</li>
+
+</ul>
+
+<h2>Function Naming</h2>
+
+<p>
+All function names are uppercase.
+</p>
+
+<p>
+Aggregate functions may support the <tt>DISTINCT</tt> keyword, e.g.
+"<tt>SELECT COUNT(DISTINCT a) FROM t;</tt>".  In NanoDB, these invocations
+are mapped to a function invocation with "<tt>#DISTINCT</tt>" appended to
+the specified function name.  For example, the example SQL will result in
+NanoDB resolving the invocation to the "<tt>COUNT#DISTINCT</tt>" function.
+</p>
+
+</body>
+</html>

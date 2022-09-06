@@ -1,0 +1,130 @@
+grammar Keywords;
+
+// These are the keywords that NanoDB recognizes.  As usual, the set definitely
+// overlaps standard SQL, and it also includes other non-standard commands.
+ADD         : 'add' ;
+ALL         : 'all' ;
+ALTER       : 'alter' ;
+ANALYZE     : 'analyze' ;
+AND         : 'and' ;
+ANY         : 'any' ;
+AS          : 'as' ;
+ASC         : 'asc' ;
+ASCENDING   : 'ascending' ;
+BEGIN       : 'begin' ;
+BETWEEN     : 'between' ;
+BY          : 'by' ;
+CASCADE     : 'cascade' ;
+CHECK       : 'check' ;
+COLUMN      : 'column' ;
+COMMIT      : 'commit' ;
+CONSTRAINT  : 'constraint' ;
+CRASH       : 'crash' ;
+CREATE      : 'create' ;
+CROSS       : 'cross' ;
+DEFAULT     : 'default' ;
+DELETE      : 'delete' ;
+DESC        : 'desc' ;
+DESCENDING  : 'descending' ;
+DISTINCT    : 'distinct' ;
+DROP        : 'drop' ;
+DUMP        : 'dump' ;
+EXCEPT      : 'except' ;
+EXISTS      : 'exists' ;
+EXIT        : 'exit' ;
+EXPLAIN     : 'explain' ;
+FALSE       : 'false' ;
+FILE        : 'file' ;
+FLUSH       : 'flush' ;
+FOREIGN     : 'foreign' ;
+FORMAT      : 'format' ;
+FROM        : 'from' ;
+FULL        : 'full' ;
+GROUP       : 'group' ;
+HAVING      : 'having' ;
+IF          : 'if' ;
+IN          : 'in' ;
+INDEX       : 'index' ;
+INNER       : 'inner' ;
+INSERT      : 'insert' ;
+INTERSECT   : 'intersect' ;
+INTERVAL    : 'interval' ;
+INTO        : 'into' ;
+IS          : 'is' ;
+JOIN        : 'join' ;
+KEY         : 'key' ;
+LEFT        : 'left' ;
+LIKE        : 'like' ;
+LIMIT       : 'limit' ;
+MINUS       : 'minus' ;
+NATURAL     : 'natural' ;
+NOT         : 'not' ;
+NULL        : 'null' ;
+OFFSET      : 'offset' ;
+ON          : 'on' ;
+OPTIMIZE    : 'optimize' ;
+OR          : 'or' ;
+ORDER       : 'order' ;
+OUTER       : 'outer' ;
+PRIMARY     : 'primary' ;
+PROPERTIES  : 'properties' ;
+PROPERTY    : 'property' ;
+QUIT        : 'quit' ;
+RECURSIVE   : 'recursive' ;
+REFERENCES  : 'references' ;
+RENAME      : 'rename' ;
+RESTRICT    : 'restrict' ;
+RIGHT       : 'right' ;
+ROLLBACK    : 'rollback' ;
+SELECT      : 'select' ;
+SET         : 'set' ;
+SHOW        : 'show' ;
+SIMILAR     : 'similar' ;
+SOME        : 'some' ;
+START       : 'start' ;
+STATS       : 'stats' ;
+TABLE       : 'table' ;
+TABLES      : 'tables' ;
+TEMPORARY   : 'temporary' ;
+TO          : 'to' ;
+TRANSACTION : 'transaction' ;
+TRUE        : 'true' ;
+TYPE        : 'type' ;
+UNION       : 'union' ;
+UNIQUE      : 'unique' ;
+UNKNOWN     : 'unknown' ;
+UPDATE      : 'update' ;
+USING       : 'using' ;
+VALUES      : 'values' ;
+VERBOSE     : 'verbose' ;
+VERIFY      : 'verify' ;
+VIEW        : 'view' ;
+WHERE       : 'where' ;
+WITH        : 'with' ;
+WORK        : 'work' ;
+
+// These tokens are for type-recognition.  A number of these types have
+// additional syntax for specifying length or precision, which is why we have
+// parser rules for them.  The type-system is not extensible by database users.
+// Note also that not all of these types are supported by NanoDB; they are
+// primarily included to reserve the keywords.
+
+TYPE_BIGINT     : 'bigint' ;
+TYPE_BLOB       : 'blob' ;
+TYPE_CHAR       : 'char' ;      // char(length)
+TYPE_CHARACTER  : 'character' ; // character(length)
+TYPE_DATE       : 'date' ;
+TYPE_DATETIME   : 'datetime' ;
+TYPE_DECIMAL    : 'decimal' ;   // decimal, decimal(prec), decimal(prec, scale)
+TYPE_FLOAT      : 'float' ;     // float, float(prec)
+TYPE_DOUBLE     : 'double' ;    // double
+TYPE_INT        : 'int' ;
+TYPE_INTEGER    : 'integer' ;
+TYPE_NUMERIC    : 'numeric' ;   // numeric, numeric(prec), numeric(prec, scale)
+TYPE_SMALLINT   : 'smallint' ;
+TYPE_TEXT       : 'text' ;
+TYPE_TIME       : 'time' ;
+TYPE_TIMESTAMP  : 'timestamp' ;
+TYPE_TINYINT    : 'tinyint' ;
+TYPE_VARCHAR    : 'varchar' ;   // varchar(length)
+TYPE_VARYING    : 'varying' ;   // character varying(length)

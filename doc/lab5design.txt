@@ -1,0 +1,62 @@
+CS122 Assignment 5 - Advanced Subqueries - Design Document
+==========================================================
+
+A:  Subquery Planning
+---------------------
+
+A1.  Which planner did your team add subquery planning to?  How easy or
+     difficult was it to incorporate subquery-planning into the planner?
+
+A2.  Briefly outline the process by which you perform subquery planning in
+     your query planner.  Also explain briefly how your subquery-planner works.
+
+A3.  Briefly describe how you detect whether there are subqueries in the
+     GROUP BY and ORDER BY clauses.  How do you make sure this doesn't
+     interfere with subqueries in other clauses?
+
+B:  Correlated Evaluation
+-------------------------
+
+B1.  How easy or difficult was it to incorporate support for correlated
+     evaluation into your query planner?  Did it affect the sequence of
+     steps in any substantial ways?
+
+D:  Extra Credit [OPTIONAL]
+---------------------------
+
+If you implemented any extra-credit tasks for this assignment, describe
+them here.  The description should be like this, with stuff in "<>" replaced.
+(The value i starts at 1 and increments...)
+
+D<i>:  <one-line description>
+
+     <brief summary of what you did, including the specific classes that
+     we should look at for your implementation>
+
+     <brief summary of test-cases that demonstrate/exercise your extra work>
+
+E:  Feedback [OPTIONAL]
+-----------------------
+
+WE NEED YOUR FEEDBACK!  Thoughtful and constructive input will help us to
+improve future versions of the course.  These questions are OPTIONAL, and
+your answers will not affect your grade in any way (including if you hate
+everything about the assignment and databases in general, or Donnie and/or
+the TAs in particular).  Feel free to answer as many or as few of them as
+you wish.
+
+E1.  What parts of the assignment were most time-consuming?  Why?
+
+E2.  Did you find any parts of the assignment particularly instructive?
+     Correspondingly, did any parts feel like unnecessary busy-work?
+
+E3.  Did you particularly enjoy any parts of the assignment?  Were there
+     any parts that you particularly disliked?
+
+E4.  Were there any critical details that you wish had been provided with the
+     assignment, that we should consider including in subsequent versions of
+     the assignment?
+
+E5.  Do you have any other suggestions for how future versions of the
+     assignment can be improved?
+
