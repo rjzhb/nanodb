@@ -370,6 +370,7 @@ public abstract class PageTuple implements Tuple {
      * <tt>NULL</tt>, or <tt>false</tt> otherwise.
      */
     public boolean isNullValue(int colIndex) {
+        //根据偏移量来判断是否是空值
         checkColumnIndex(colIndex);
         return (valueOffsets[colIndex] == NULL_OFFSET);
     }
@@ -395,9 +396,11 @@ public abstract class PageTuple implements Tuple {
         checkColumnIndex(colIndex);
 
         Object value = null;
+        //先判断是否为空值
         if (!isNullValue(colIndex)) {
             int offset = valueOffsets[colIndex];
 
+            //根据type从dbpage读取真正的值
             ColumnType colType = schema.getColumnInfo(colIndex).getType();
             switch (colType.getBaseType()) {
 
@@ -516,6 +519,22 @@ public abstract class PageTuple implements Tuple {
          * properly as well.  (Note that columns whose value is NULL will have
          * the special NULL_OFFSET constant as their offset in the tuple.)
          */
+        //设置nullflag
+        setNullFlag(iCol, true);
+
+        //删除这个位置的tuple
+        ColumnInfo columnInfo = schema.getColumnInfo(iCol);
+        ColumnType type = columnInfo.getType();
+        //这个是上面已经封装好了的方法，也可以尝试重复造轮子，练习练习
+        deleteTupleDataRange(valueOffsets[iCol], getStorageSize(type, getColumnValueSize(type, valueOffsets[iCol])));
+
+        //刷新valueoffset数组
+        valueOffsets[iCol] = NULL_OFFSET;
+        for (int i = iCol + 1; i < valueOffsets.length; i++) {
+            int columnSize = valueOffsets[iCol + 1] - valueOffsets[iCol];
+            //left move
+            valueOffsets[i] -= columnSize;
+        }
 
     }
 
@@ -559,7 +578,30 @@ public abstract class PageTuple implements Tuple {
          * Finally, once you have made space for the new column value, you can
          * write the value itself using the writeNonNullValue() method.
          */
-        throw new UnsupportedOperationException("TODO:  Implement!");
+        //clear null flag
+        if (getNullFlag(iCol)) {
+            setNullFlag(iCol, false);
+        }
+
+        //调用type，分别根据object的类型进行相应变换
+        ColumnInfo columnInfo = schema.getColumnInfo(iCol);
+        ColumnType colType = columnInfo.getType();
+
+        if (colType.getBaseType() == SQLDataType.VARCHAR) {
+            //可变长，比较object长度和datalength
+            int columnValueSize = getColumnValueSize(colType, valueOffsets[iCol]);
+            //value
+            String val = value.toString();
+            int setValueSize = val.length();
+            //这种情况需要更新valueoffset
+            int delta = columnValueSize - setValueSize;
+            for (int i = iCol + 1; i < valueOffsets.length; i++) {
+                valueOffsets[i] -= delta;
+            }
+        }
+
+        //写入DBpage里面的data，后面会自动判断脏页写回磁盘
+        writeNonNullValue(dbPage, valueOffsets[iCol], colType, value);
     }
 
 
