@@ -56,15 +56,21 @@ public abstract class PageTuple implements Tuple {
     private int pinCount;
 
 
-    /** The database page that contains the tuple's data. */
+    /**
+     * The database page that contains the tuple's data.
+     */
     private DBPage dbPage;
 
 
-    /** The offset in the page of the tuple's start. */
+    /**
+     * The offset in the page of the tuple's start.
+     */
     private int pageOffset;
 
 
-    /** The schema of the tuple. */
+    /**
+     * The schema of the tuple.
+     */
     private Schema schema;
 
 
@@ -104,7 +110,7 @@ public abstract class PageTuple implements Tuple {
 
         if (pageOffset < 0 || pageOffset >= dbPage.getPageSize()) {
             throw new IllegalArgumentException("pageOffset must be in range [0, " +
-                dbPage.getPageSize() + "); got " + pageOffset);
+                    dbPage.getPageSize() + "); got " + pageOffset);
         }
 
         this.dbPage = dbPage;
@@ -143,7 +149,7 @@ public abstract class PageTuple implements Tuple {
     public void unpin() {
         if (pinCount <= 0) {
             throw new IllegalStateException(
-                "pinCount is not positive (value is " + pinCount + ")");
+                    "pinCount is not positive (value is " + pinCount + ")");
         }
 
         pinCount--;
@@ -217,14 +223,13 @@ public abstract class PageTuple implements Tuple {
      * range of values.
      *
      * @param colIndex the column index to check
-     *
      * @throws java.lang.IllegalArgumentException if the specified column
-     *         index is out of range.
+     *                                            index is out of range.
      */
     private void checkColumnIndex(int colIndex) {
         if (colIndex < 0 || colIndex >= schema.numColumns()) {
             throw new IllegalArgumentException("Column index must be in " +
-                "range [0," + (schema.numColumns() - 1) + "], got " + colIndex);
+                    "range [0," + (schema.numColumns() - 1) + "], got " + colIndex);
         }
     }
 
@@ -246,7 +251,6 @@ public abstract class PageTuple implements Tuple {
      * column information.
      *
      * @param colIndex the index of the column to retrieve the null-flag for
-     *
      * @return <tt>true</tt> if the column is null, or <tt>false</tt> otherwise
      */
     private boolean getNullFlag(int colIndex) {
@@ -270,9 +274,8 @@ public abstract class PageTuple implements Tuple {
      * flag.
      *
      * @param colIndex the index of the column to retrieve the null-flag for
-     *
-     * @param value <tt>true</tt> if the column is null, or <tt>false</tt>
-     *        otherwise
+     * @param value    <tt>true</tt> if the column is null, or <tt>false</tt>
+     *                 otherwise
      */
     private void setNullFlag(int colIndex, boolean value) {
         checkColumnIndex(colIndex);
@@ -323,8 +326,7 @@ public abstract class PageTuple implements Tuple {
             if (getNullFlag(iCol)) {
                 // This column is marked as being NULL.
                 valueOffsets[iCol] = NULL_OFFSET;
-            }
-            else {
+            } else {
                 // This column is not NULL.  Store the current offset, then
                 // move forward past this value's bytes.
                 valueOffsets[iCol] = valOffset;
@@ -342,13 +344,11 @@ public abstract class PageTuple implements Tuple {
      * Returns the number of bytes used by the column-value at the specified
      * offset, with the specified type.
      *
-     * @param colType the column type, which includes both the basic SQL data
-     *        type (e.g. <tt>VARCHAR</tt>) and the size/length of the column's
-     *        type.
-     *
+     * @param colType     the column type, which includes both the basic SQL data
+     *                    type (e.g. <tt>VARCHAR</tt>) and the size/length of the column's
+     *                    type.
      * @param valueOffset the offset in the data where the column's value
-     *        actually starts
-     *
+     *                    actually starts
      * @return the total number of bytes used by the column-value
      */
     private int getColumnValueSize(ColumnType colType, int valueOffset) {
@@ -367,7 +367,7 @@ public abstract class PageTuple implements Tuple {
      * <tt>NULL</tt> value.
      *
      * @return <tt>true</tt> if the specified column is currently set to
-     *         <tt>NULL</tt>, or <tt>false</tt> otherwise.
+     * <tt>NULL</tt>, or <tt>false</tt> otherwise.
      */
     public boolean isNullValue(int colIndex) {
         checkColumnIndex(colIndex);
@@ -401,63 +401,63 @@ public abstract class PageTuple implements Tuple {
             ColumnType colType = schema.getColumnInfo(colIndex).getType();
             switch (colType.getBaseType()) {
 
-            case INTEGER:
-                value = dbPage.readInt(offset);
-                break;
+                case INTEGER:
+                    value = dbPage.readInt(offset);
+                    break;
 
-            case SMALLINT:
-                value = dbPage.readShort(offset);
-                break;
+                case SMALLINT:
+                    value = dbPage.readShort(offset);
+                    break;
 
-            case BIGINT:
-                value = dbPage.readLong(offset);
-                break;
+                case BIGINT:
+                    value = dbPage.readLong(offset);
+                    break;
 
-            case TINYINT:
-                value = dbPage.readByte(offset);
-                break;
+                case TINYINT:
+                    value = dbPage.readByte(offset);
+                    break;
 
-            case FLOAT:
-                value = dbPage.readFloat(offset);
-                break;
+                case FLOAT:
+                    value = dbPage.readFloat(offset);
+                    break;
 
-            case DOUBLE:
-                value = dbPage.readDouble(offset);
-                break;
+                case DOUBLE:
+                    value = dbPage.readDouble(offset);
+                    break;
 
-            case NUMERIC:
-                value = dbPage.readNumeric(offset);
-                break;
+                case NUMERIC:
+                    value = dbPage.readNumeric(offset);
+                    break;
 
-            case CHAR:
-                value = dbPage.readFixedSizeString(offset, colType.getLength());
-                break;
+                case CHAR:
+                    value = dbPage.readFixedSizeString(offset, colType.getLength());
+                    break;
 
-            case VARCHAR:
-                value = dbPage.readVarString65535(offset);
-                break;
+                case VARCHAR:
+                    value = dbPage.readVarString65535(offset);
+                    break;
 
-            case DATE:
-                value = dbPage.readDate(offset);
-                break;
+                case DATE:
+                    value = dbPage.readDate(offset);
+                    break;
 
-            case TIME:
-                value = dbPage.readTime(offset);
-                break;
+                case TIME:
+                    value = dbPage.readTime(offset);
+                    break;
 
-            case DATETIME:
-            case TIMESTAMP:
-                value = dbPage.readDateTime(offset);
-                break;
+                case DATETIME:
+                case TIMESTAMP:
+                    value = dbPage.readDateTime(offset);
+                    break;
 
-            case FILE_POINTER:
-                value = new FilePointer(dbPage.readUnsignedShort(offset),
-                                        dbPage.readUnsignedShort(offset + 2));
-                break;
+                case FILE_POINTER:
+                    value = new FilePointer(dbPage.readUnsignedShort(offset),
+                            dbPage.readUnsignedShort(offset + 2));
+                    break;
 
-            default:
-                throw new UnsupportedOperationException(
-                    "Cannot currently store type " + colType.getBaseType());
+                default:
+                    throw new UnsupportedOperationException(
+                            "Cannot currently store type " + colType.getBaseType());
             }
         }
 
@@ -470,9 +470,8 @@ public abstract class PageTuple implements Tuple {
      * the Java <tt>null</tt> value.
      *
      * @param colIndex The index of the column to set.
-     *
-     * @param value the value to set the column to, or <tt>null</tt> if the
-     *        column should be set to the SQL <tt>NULL</tt> value.
+     * @param value    the value to set the column to, or <tt>null</tt> if the
+     *                 column should be set to the SQL <tt>NULL</tt> value.
      */
     public void setColumnValue(int colIndex, Object value) {
         checkColumnIndex(colIndex);
@@ -480,8 +479,7 @@ public abstract class PageTuple implements Tuple {
         if (value == null) {
             // Set the column-value to NULL.
             setNullColumnValue(colIndex);
-        }
-        else {
+        } else {
             // Update the value stored in the tuple to what was specified.
             setNonNullColumnValue(colIndex, value);
         }
@@ -518,7 +516,7 @@ public abstract class PageTuple implements Tuple {
          * properly as well.  (Note that columns whose value is NULL will have
          * the special NULL_OFFSET constant as their offset in the tuple.)
          */
-        throw new UnsupportedOperationException("TODO:  Implement!");
+
     }
 
 
@@ -527,10 +525,8 @@ public abstract class PageTuple implements Tuple {
      * the specific case when a column is being set to a non-<tt>NULL</tt>
      * value.
      *
-     * @param iCol The index of the column to set.
-     *
+     * @param iCol  The index of the column to set.
      * @param value the value to set the column to.
-     *
      * @throws IllegalArgumentException if the specified value is {@code null}
      */
     private void setNonNullColumnValue(int iCol, Object value) {
@@ -572,16 +568,14 @@ public abstract class PageTuple implements Tuple {
      * store the null-flags in each tuple.
      *
      * @param numCols the total number of columns in the table
-     *
      * @return the number of bytes used for the null-bitmap.
-     *
      * @review (donnie) This is really a table-file-level computation, not a
-     *         tuple-level computation.
+     * tuple-level computation.
      */
     public static int getNullFlagsSize(int numCols) {
         if (numCols < 0) {
             throw new IllegalArgumentException("numCols must be >= 0; got " +
-                numCols);
+                    numCols);
         }
 
         int nullFlagsSize = 0;
@@ -600,10 +594,9 @@ public abstract class PageTuple implements Tuple {
      * required when the type is <tt>CHAR</tt>, since <tt>CHAR</tt> fields
      * always have a specific size.
      *
-     * @param colType the column's data type
+     * @param colType    the column's data type
      * @param dataLength for column-types that specify a length, this is the
-     *        length value.
-     *
+     *                   length value.
      * @return the storage size of the data in bytes
      */
     public static int getStorageSize(ColumnType colType, int dataLength) {
@@ -611,66 +604,66 @@ public abstract class PageTuple implements Tuple {
 
         switch (colType.getBaseType()) {
 
-        case INTEGER:
-        case FLOAT:
-            size = 4;
-            break;
+            case INTEGER:
+            case FLOAT:
+                size = 4;
+                break;
 
-        case SMALLINT:
-            size = 2;
-            break;
+            case SMALLINT:
+                size = 2;
+                break;
 
-        case BIGINT:
-        case DOUBLE:
-            size = 8;
-            break;
+            case BIGINT:
+            case DOUBLE:
+                size = 8;
+                break;
 
-        case TINYINT:
-            size = 1;
-            break;
+            case TINYINT:
+                size = 1;
+                break;
 
-        case CHAR:
-            // CHAR values are of a fixed size, but the size is specified in
-            // the length field and there is no other storage required.
-            size = colType.getLength();
-            break;
+            case CHAR:
+                // CHAR values are of a fixed size, but the size is specified in
+                // the length field and there is no other storage required.
+                size = colType.getLength();
+                break;
 
-        case VARCHAR:
-            // VARCHAR values are of a variable size, but there is always a
-            // two byte length specified at the start of the value.
-            size = 2 + dataLength;
-            break;
+            case VARCHAR:
+                // VARCHAR values are of a variable size, but there is always a
+                // two byte length specified at the start of the value.
+                size = 2 + dataLength;
+                break;
 
-        case NUMERIC:
-            // NUMERIC values are stored as 1-byte scale + 15 bytes of bigint.
-            size = 16;
-            break;
+            case NUMERIC:
+                // NUMERIC values are stored as 1-byte scale + 15 bytes of bigint.
+                size = 16;
+                break;
 
-        case DATE:
-            // Dates are stored as an int "days since epoch"
-            size = 4;
-            break;
+            case DATE:
+                // Dates are stored as an int "days since epoch"
+                size = 4;
+                break;
 
-        case TIME:
-            // Times are stored as an int "milliseconds since epoch"
-            size = 4;
-            break;
+            case TIME:
+                // Times are stored as an int "milliseconds since epoch"
+                size = 4;
+                break;
 
-        case DATETIME:
-        case TIMESTAMP:
-            // Datetimes are a combination of a date and a time
-            size = 8;
-            break;
+            case DATETIME:
+            case TIMESTAMP:
+                // Datetimes are a combination of a date and a time
+                size = 8;
+                break;
 
-        case FILE_POINTER:
-            // File-pointers are comprised of a two-byte page number and a
-            // two-byte offset in the page.
-            size = 4;
-            break;
+            case FILE_POINTER:
+                // File-pointers are comprised of a two-byte page number and a
+                // two-byte offset in the page.
+                size = 4;
+                break;
 
-        default:
-            throw new UnsupportedOperationException(
-                "Cannot currently store type " + colType.getBaseType());
+            default:
+                throw new UnsupportedOperationException(
+                        "Cannot currently store type " + colType.getBaseType());
         }
 
         return size;
@@ -684,22 +677,19 @@ public abstract class PageTuple implements Tuple {
      * a table file by computing how much space will be needed, so that an
      * appropriate page can be found.
      *
-     * @review (donnie) It doesn't make sense to have this be a non-static
-     *         method, since a page-tuple references a specific tuple, not a
-     *         data page.  However, having this as a static method on this
-     *         class doesn't seem too bad.
-     *
      * @param schema the schema of the tuple
-     *
-     * @param tuple the tuple to compute the storage size for
-     *
+     * @param tuple  the tuple to compute the storage size for
      * @return the total size for storing the tuple's data in bytes
+     * @review (donnie) It doesn't make sense to have this be a non-static
+     * method, since a page-tuple references a specific tuple, not a
+     * data page.  However, having this as a static method on this
+     * class doesn't seem too bad.
      */
     public static int getTupleStorageSize(Schema schema, Tuple tuple) {
 
         if (schema.numColumns() != tuple.getColumnCount()) {
             throw new IllegalArgumentException(
-                "Tuple has different arity than target schema.");
+                    "Tuple has different arity than target schema.");
         }
 
         int storageSize = getNullFlagsSize(schema.numColumns());
@@ -736,7 +726,7 @@ public abstract class PageTuple implements Tuple {
 
         if (schema.numColumns() != tuple.getColumnCount()) {
             throw new IllegalArgumentException(
-            "Tuple has different arity than target schema.");
+                    "Tuple has different arity than target schema.");
         }
 
         // Start writing data just past the NULL-flag bytes.
@@ -751,8 +741,7 @@ public abstract class PageTuple implements Tuple {
             // the corresponding NULL-flag.  Otherwise, write the value.
             if (value == null) {
                 setNullFlag(dbPage, pageOffset, iCol, true);
-            }
-            else {
+            } else {
                 // Write in the data value.
                 setNullFlag(dbPage, pageOffset, iCol, false);
                 dataSize = writeNonNullValue(dbPage, currOffset, colType, value);
@@ -770,16 +759,13 @@ public abstract class PageTuple implements Tuple {
      * This is a helper function to set or clear the value of a column's
      * <tt>NULL</tt> flag.
      *
-     * @param dbPage the file-page that the value will be written into
-     *
+     * @param dbPage     the file-page that the value will be written into
      * @param tupleStart the byte-offset in the page where the tuple starts
-     *
-     * @param colIndex the index of the column to set the null-flag for
-     *
-     * @param value the new value for the null-flag
+     * @param colIndex   the index of the column to set the null-flag for
+     * @param value      the new value for the null-flag
      */
     public static void setNullFlag(DBPage dbPage, int tupleStart,
-        int colIndex, boolean value) {
+                                   int colIndex, boolean value) {
 
         //checkColumnIndex(colIndex);
 
@@ -801,25 +787,22 @@ public abstract class PageTuple implements Tuple {
     }
 
 
-
     /**
      * This helper function is used by the {@link #setColumnValue} method in
      * the specific case when a column is being set to a non-<tt>NULL</tt>
      * value.
      *
-     * @param dbPage the file-page that the value will be written into
-     * @param offset the actual byte-offset in the page where the value is
-     *        written to
+     * @param dbPage  the file-page that the value will be written into
+     * @param offset  the actual byte-offset in the page where the value is
+     *                written to
      * @param colType the type of the column that the value is being written for
-     * @param value the non-<tt>null</tt> value to store
-     *
+     * @param value   the non-<tt>null</tt> value to store
      * @return The number of bytes written for the specified value.
-     *
      * @throws NullPointerException if <tt>dbPage</tt> is <tt>null</tt>, or if
-     *         <tt>value</tt> is <tt>null</tt>.
+     *                              <tt>value</tt> is <tt>null</tt>.
      */
     public static int writeNonNullValue(DBPage dbPage, int offset,
-        ColumnType colType, Object value) {
+                                        ColumnType colType, Object value) {
         return dbPage.writeObject(offset, colType, value);
     }
 

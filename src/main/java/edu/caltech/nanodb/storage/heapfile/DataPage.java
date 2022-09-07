@@ -16,15 +16,17 @@ import edu.caltech.nanodb.storage.DBPage;
  * data.
  *
  * @design (Donnie) Why is this class a static class, instea  d of a wrapper class
- *         around the {@link DBPage}?  No particular reason, really.  The class
- *         is used relatively briefly when a table is being accessed, and there
- *         is no real need for it to manage its own object-state, so it was just
- *         as convenient to provide all functionality as static methods.  This
- *         avoids the (small) overhead of instantiating an object as well.  But
- *         really, these are not particularly strong reasons.
+ * around the {@link DBPage}?  No particular reason, really.  The class
+ * is used relatively briefly when a table is being accessed, and there
+ * is no real need for it to manage its own object-state, so it was just
+ * as convenient to provide all functionality as static methods.  This
+ * avoids the (small) overhead of instantiating an object as well.  But
+ * really, these are not particularly strong reasons.
  */
 public class DataPage {
-    /** A logging object for reporting anything interesting that happens. */
+    /**
+     * A logging object for reporting anything interesting that happens.
+     */
     private static Logger logger = LogManager.getLogger(DataPage.class);
 
 
@@ -83,7 +85,7 @@ public class DataPage {
      * (which relies on the offset stored in the last slot) will produce wrong
      * results.
      *
-     * @param dbPage the data page to set the number of slots for
+     * @param dbPage   the data page to set the number of slots for
      * @param numSlots the value to store
      */
     public static void setNumSlots(DBPage dbPage, int numSlots) {
@@ -98,7 +100,7 @@ public class DataPage {
      *
      * @param dbPage the data page to examine
      * @return the index in the page data where the slot-table ends.  This also
-     *         happens to be the size of the slot-table in bytes.
+     * happens to be the size of the slot-table in bytes.
      */
     public static int getSlotsEndIndex(DBPage dbPage) {
         // Slots are at indexes [0, numSlots), so just pass the total number of
@@ -114,20 +116,18 @@ public class DataPage {
      * page, or it will be {@link #EMPTY_SLOT} if the slot is empty.
      *
      * @param dbPage the data page to retrieve the slot-value from
-     * @param slot the slot to retrieve the value for; valid values are from 0
-     *        to {@link #getNumSlots} - 1.
-     *
+     * @param slot   the slot to retrieve the value for; valid values are from 0
+     *               to {@link #getNumSlots} - 1.
      * @return the current value stored for the slot in the data page
-     *
      * @throws IllegalArgumentException if the specified slot number is outside
-     *         the range [0, {@link #getNumSlots}).
+     *                                  the range [0, {@link #getNumSlots}).
      */
     public static int getSlotValue(DBPage dbPage, int slot) {
         int numSlots = getNumSlots(dbPage);
 
         if (slot < 0 || slot >= numSlots) {
             throw new IllegalArgumentException("Valid slots are in range [0," +
-                numSlots + ").  Got " + slot);
+                    numSlots + ").  Got " + slot);
         }
 
         //这里用了个序列化算法，将值最终序列化为int
@@ -141,19 +141,18 @@ public class DataPage {
      * page, or it should be {@link #EMPTY_SLOT} if the slot is empty.
      *
      * @param dbPage the data page to set the slot-value for
-     * @param slot the slot to set the value of; valid values are from 0 to
-     *        {@link #getNumSlots} - 1.
-     * @param value the value to store for the slot
-     *
+     * @param slot   the slot to set the value of; valid values are from 0 to
+     *               {@link #getNumSlots} - 1.
+     * @param value  the value to store for the slot
      * @throws IllegalArgumentException if the specified slot number is outside
-     *         the range [0, {@link #getNumSlots}).
+     *                                  the range [0, {@link #getNumSlots}).
      */
     public static void setSlotValue(DBPage dbPage, int slot, int value) {
         int numSlots = getNumSlots(dbPage);
 
         if (slot < 0 || slot >= numSlots) {
             throw new IllegalArgumentException("Valid slots are in range [0," +
-                numSlots + ").  Got " + slot);
+                    numSlots + ").  Got " + slot);
         }
 
         dbPage.writeShort(getSlotOffset(slot), value);
@@ -161,11 +160,11 @@ public class DataPage {
 
 
     public static int getSlotIndexFromOffset(DBPage dbPage, int offset)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
 
         if (offset % 2 != 0) {
             throw new IllegalArgumentException(
-                "Slots occur at even indexes (each slot is a short).");
+                    "Slots occur at even indexes (each slot is a short).");
         }
 
         int slot = (offset - 2) / 2;
@@ -173,7 +172,7 @@ public class DataPage {
 
         if (slot < 0 || slot >= numSlots) {
             throw new IllegalArgumentException("Valid slots are in range [0," +
-                numSlots + ").  Got " + slot);
+                    numSlots + ").  Got " + slot);
         }
 
         return slot;
@@ -188,11 +187,9 @@ public class DataPage {
      * other words, we add tuple data from the back of the block towards the
      * front.)
      *
-     * @see #setNumSlots
-     *
      * @param dbPage the data page to examine
-     *
      * @return the index where the tuple data starts in this data page
+     * @see #setNumSlots
      */
     public static int getTupleDataStart(DBPage dbPage) {
         int numSlots = getNumSlots(dbPage);
@@ -224,7 +221,6 @@ public class DataPage {
      * page-size.
      *
      * @param dbPage the data page to examine
-     *
      * @return the index where the tuple data ends in this data page
      */
     public static int getTupleDataEnd(DBPage dbPage) {
@@ -238,18 +234,17 @@ public class DataPage {
      * invalid to use this method on an empty slot.
      *
      * @param dbPage the data page being examined
-     * @param slot the slot of the tuple to retrieve the length of
+     * @param slot   the slot of the tuple to retrieve the length of
      * @return the length of the tuple's data stored in this slot
-     *
      * @throws IllegalArgumentException if the specified slot is invalid, or if
-     *         the specified slot has {@link #EMPTY_SLOT} for its value
+     *                                  the specified slot has {@link #EMPTY_SLOT} for its value
      */
     public static int getTupleLength(DBPage dbPage, int slot) {
         int numSlots = getNumSlots(dbPage);
 
         if (slot < 0 || slot >= numSlots) {
             throw new IllegalArgumentException(
-                "Valid slots are in range [0," + slot + ").  Got " + slot);
+                    "Valid slots are in range [0," + slot + ").  Got " + slot);
         }
 
         int tupleStart = getSlotValue(dbPage, slot);
@@ -297,7 +292,7 @@ public class DataPage {
 
 
     /**
-     *检查slot的值是否符合规范,必须符合slotvalue满足递减原则
+     * 检查slot的值是否符合规范,必须符合slotvalue满足递减原则
      * 基本算法：先找到第一个，然后再while循环，出现第一个递增就logger.warn
      * This static helper method verifies that the specified data page has
      * proper structure and organization by performing various sanity checks.
@@ -337,9 +332,9 @@ public class DataPage {
                 // Tuple offsets should be strictly decreasing.
                 if (prevOffset <= offset) {
                     logger.warn(String.format(
-                        "Slot %d and %d offsets are not strictly decreasing " +
-                        "(%d should be greater than %d)", prevSlot, iSlot,
-                        prevOffset, offset));
+                            "Slot %d and %d offsets are not strictly decreasing " +
+                                    "(%d should be greater than %d)", prevSlot, iSlot,
+                            prevOffset, offset));
                 }
 
                 prevSlot = iSlot;
@@ -349,9 +344,7 @@ public class DataPage {
     }
 
 
-
     /**
-     *
      * <p>
      * This static helper function creates a space in the data page of the
      * specified size, sliding tuple data below the offset down to
@@ -361,10 +354,8 @@ public class DataPage {
      * <p>The new space is initialized to all zero values.</p>
      *
      * @param dbPage The table data-page to insert space into.
-     *
-     * @param off The offset in the page where the space will be added.
-     *
-     * @param len The number of bytes to insert.
+     * @param off    The offset in the page where the space will be added.
+     * @param len    The number of bytes to insert.
      */
     public static void insertTupleDataRange(DBPage dbPage, int off, int len) {
 
@@ -372,8 +363,8 @@ public class DataPage {
 
         if (off < tupDataStart) {
             throw new IllegalArgumentException("Specified offset " + off +
-                " is not actually in the tuple data portion of this page " +
-                "(data starts at offset " + tupDataStart + ").");
+                    " is not actually in the tuple data portion of this page " +
+                    "(data starts at offset " + tupDataStart + ").");
         }
 
         if (len < 0)
@@ -381,8 +372,8 @@ public class DataPage {
 
         if (len > getFreeSpaceInPage(dbPage)) {
             throw new IllegalArgumentException("Specified length " + len +
-                " is larger than amount of free space in this page (" +
-                getFreeSpaceInPage(dbPage) + " bytes).");
+                    " is larger than amount of free space in this page (" +
+                    getFreeSpaceInPage(dbPage) + " bytes).");
         }
 
         // If off == tupDataStart then there's no need to move anything.
@@ -392,7 +383,7 @@ public class DataPage {
             // range [off - len, off) after the operation is completed.
 
             dbPage.moveDataRange(tupDataStart, tupDataStart - len,
-                off - tupDataStart);
+                    off - tupDataStart);
         }
 
         // Zero out the gap that was just created.
@@ -422,21 +413,19 @@ public class DataPage {
      * move, some of the slots in the page may also need to be modified.
      *
      * @param dbPage The table data-page to insert space into.
-     *
-     * @param off The offset in the page where the space will be removed.
-     *
-     * @param len The number of bytes to remove.
+     * @param off    The offset in the page where the space will be removed.
+     * @param len    The number of bytes to remove.
      */
     public static void deleteTupleDataRange(DBPage dbPage, int off, int len) {
         int tupDataStart = getTupleDataStart(dbPage);
 
         logger.debug(String.format(
-            "Deleting tuple data-range offset %d, length %d", off, len));
+                "Deleting tuple data-range offset %d, length %d", off, len));
 
         if (off < tupDataStart) {
             throw new IllegalArgumentException("Specified offset " + off +
-                " is not actually in the tuple data portion of this page " +
-                "(data starts at offset " + tupDataStart + ").");
+                    " is not actually in the tuple data portion of this page " +
+                    "(data starts at offset " + tupDataStart + ").");
         }
 
         if (len < 0)
@@ -444,17 +433,17 @@ public class DataPage {
 
         if (getTupleDataEnd(dbPage) - off < len) {
             throw new IllegalArgumentException("Specified length " + len +
-                " is larger than size of tuple data in this page (" +
-                (getTupleDataEnd(dbPage) - off) + " bytes).");
+                    " is larger than size of tuple data in this page (" +
+                    (getTupleDataEnd(dbPage) - off) + " bytes).");
         }
 
         // Move the data in the range [tupDataStart, off) to
         // [tupDataStart + len, off + len).
 
         logger.debug(String.format(
-            "    Moving %d bytes of data from [%d, %d) to [%d, %d)",
-            off - tupDataStart, tupDataStart, off,
-            tupDataStart + len, off + len));
+                "    Moving %d bytes of data from [%d, %d) to [%d, %d)",
+                off - tupDataStart, tupDataStart, off,
+                tupDataStart + len, off + len));
 
         //数据转移
         dbPage.moveDataRange(tupDataStart, tupDataStart + len, off - tupDataStart);
@@ -483,18 +472,16 @@ public class DataPage {
      * to all zero values.
      *
      * @param dbPage The data page to store the new tuple in.
-     *
-     * @param len The length of the new tuple's data.
-     *
+     * @param len    The length of the new tuple's data.
      * @return The slot-index for the new tuple.  The offset to the start
-     *         of the requested space is available via that slot.  (Use
-     *         {@link #getSlotValue} to retrieve that offset.)
+     * of the requested space is available via that slot.  (Use
+     * {@link #getSlotValue} to retrieve that offset.)
      */
     public static int allocNewTuple(DBPage dbPage, int len) {
 
         if (len < 0) {
             throw new IllegalArgumentException(
-                "Length must be nonnegative; got " + len);
+                    "Length must be nonnegative; got " + len);
         }
 
         // The amount of free space we need in the database page, if we are
@@ -542,9 +529,9 @@ public class DataPage {
             // this fails, it would indicate a bug.  So, runtime exception is
             // fine for now.
             throw new IllegalArgumentException(
-                "Space needed for new tuple (" + spaceNeeded +
-                " bytes) is larger than the free space in this page (" +
-                getFreeSpaceInPage(dbPage) + " bytes).");
+                    "Space needed for new tuple (" + spaceNeeded +
+                            " bytes) is larger than the free space in this page (" +
+                            getFreeSpaceInPage(dbPage) + " bytes).");
         }
 
         // Now we know we have space for the tuple.  Update the slot list,
@@ -561,14 +548,14 @@ public class DataPage {
         }
 
         logger.debug(String.format(
-            "Tuple will get slot %d.  Final number of slots:  %d",
-            slot, numSlots));
+                "Tuple will get slot %d.  Final number of slots:  %d",
+                slot, numSlots));
 
         int newTupleStart = newTupleEnd - len;
 
         logger.debug(String.format(
-            "New tuple of %d bytes will reside at location [%d, %d).",
-            len, newTupleStart, newTupleEnd));
+                "New tuple of %d bytes will reside at location [%d, %d).",
+                len, newTupleStart, newTupleEnd));
 
         // Make room for the new tuple's data to be stored into.  Since
         // tuples are stored from the END of the page going backwards, we
@@ -595,20 +582,20 @@ public class DataPage {
      * "deleted" are reclaimed.
      *
      * @param dbPage the data page to remove the tuple from
-     * @param slot the slot of the tuple to delete
+     * @param slot   the slot of the tuple to delete
      */
     public static void deleteTuple(DBPage dbPage, int slot) {
 
         if (slot < 0) {
             throw new IllegalArgumentException(
-                "Slot must be nonnegative; got " + slot);
+                    "Slot must be nonnegative; got " + slot);
         }
 
         int numSlots = getNumSlots(dbPage);
 
         if (slot >= numSlots) {
             throw new IllegalArgumentException("Page only has " + numSlots +
-                " slots, but slot " + slot + " was requested for deletion.");
+                    " slots, but slot " + slot + " was requested for deletion.");
         }
 
         // TODO:  Complete this implementation.
@@ -624,21 +611,21 @@ public class DataPage {
          * remove them so that this space can also be reclaimed.
          * Remember that you cannot remove an empty slot if it is followed by one or more non-empty slots.
          */
-
-        //1.检验这个slot的tuple是否已经被占用,判断是否是脏页
+        //检测是否有tuple
         int slotValue = getSlotValue(dbPage, slot);
+        if (slotValue == EMPTY_SLOT) {
+            //这个slot根本没有tuple，无需删除
+            return;
+        }
+        //有tuple，则删除
+        int len = getTupleLength(dbPage, slot);
+        deleteTupleDataRange(dbPage, slotValue, len);
+        setSlotValue(dbPage, slot, EMPTY_SLOT);
 
-
-        //2.如果占用，就不能删除
-
-        //3.不占用，删除，调用deleteTupleDataRange()
-        deleteTupleDataRange(dbPage,slot,1);
-        setSlotValue(dbPage,slot,EMPTY_SLOT);
-        //4.设置slot为Empty_SLOT value
-
-        //5.看是否有空格在末尾
-
-        //6.检验规范性
+        //去除末尾的空格
+        dbPage.setDataRange(0, getTupleDataStart(dbPage), (byte) 0);
+        //检验规范性
+        sanityCheck(dbPage);
 
     }
 }
