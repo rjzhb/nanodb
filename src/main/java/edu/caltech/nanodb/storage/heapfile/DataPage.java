@@ -15,7 +15,7 @@ import edu.caltech.nanodb.storage.DBPage;
  * start of <em>i</em>'s tuple data will be <u>after</u> <em>j</em>'s tuple
  * data.
  *
- * @design (Donnie) Why is this class a static class, instead of a wrapper class
+ * @design (Donnie) Why is this class a static class, instea  d of a wrapper class
  *         around the {@link DBPage}?  No particular reason, really.  The class
  *         is used relatively briefly when a table is being accessed, and there
  *         is no real need for it to manage its own object-state, so it was just
@@ -76,6 +76,7 @@ public class DataPage {
 
 
     /**
+     * 设置某dbpage的slot数量
      * Sets the number of slots in this data page.  Note that if the number of
      * slots is increased, the new slots <em>must</em> be initialized to
      * {@link #EMPTY_SLOT}, or else functions like {@link #getFreeSpaceInPage}
@@ -91,6 +92,7 @@ public class DataPage {
 
 
     /**
+     * 获得结尾的slot
      * This static helper function returns the index where the slot list ends in
      * the data page.
      *
@@ -106,6 +108,7 @@ public class DataPage {
 
 
     /**
+     * 获得slot的值
      * This static helper function returns the value stored in the specified
      * slot.  This will either be the offset of the start of a tuple in the data
      * page, or it will be {@link #EMPTY_SLOT} if the slot is empty.
@@ -127,6 +130,7 @@ public class DataPage {
                 numSlots + ").  Got " + slot);
         }
 
+        //这里用了个序列化算法，将值最终序列化为int
         return dbPage.readUnsignedShort(getSlotOffset(slot));
     }
 
@@ -213,6 +217,7 @@ public class DataPage {
 
 
     /**
+     * 获得tuple的结尾数据
      * This static helper function returns the index of where tuple data
      * currently ends in the specified data page.  This value depends more on
      * the overall structure of the data page, and at present is simply the
@@ -228,6 +233,7 @@ public class DataPage {
 
 
     /**
+     * 获得tuple长度
      * Returns the length of the tuple stored at the specified slot.  It is
      * invalid to use this method on an empty slot.
      *
@@ -277,6 +283,7 @@ public class DataPage {
 
 
     /**
+     * 获得空闲页面
      * This static helper function returns the amount of free space in
      * a tuple data page.  It simply uses other methods in this class to
      * perform the simple computation.
@@ -290,6 +297,8 @@ public class DataPage {
 
 
     /**
+     *检查slot的值是否符合规范,必须符合slotvalue满足递减原则
+     * 基本算法：先找到第一个，然后再while循环，出现第一个递增就logger.warn
      * This static helper method verifies that the specified data page has
      * proper structure and organization by performing various sanity checks.
      * Currently, the only sanity check it performs is to verify that
@@ -342,6 +351,7 @@ public class DataPage {
 
 
     /**
+     *
      * <p>
      * This static helper function creates a space in the data page of the
      * specified size, sliding tuple data below the offset down to
@@ -446,6 +456,7 @@ public class DataPage {
             off - tupDataStart, tupDataStart, off,
             tupDataStart + len, off + len));
 
+        //数据转移
         dbPage.moveDataRange(tupDataStart, tupDataStart + len, off - tupDataStart);
 
         // Update affected slots; this includes all (non-empty) slots whose
@@ -601,6 +612,33 @@ public class DataPage {
         }
 
         // TODO:  Complete this implementation.
-        throw new UnsupportedOperationException("TODO:  Implement!");
+        /**
+         * Reclaim the space
+         * that was previously occupied by the tuple being deleted
+         * by using the helper function.
+         * Make sure you don’t accidentally clobber adjacent tuples.deleteTupleDataRange()
+         *
+         * Set the tuple’s slot to the EMPTY_SLOT value.
+         *
+         * Finally, if there are empty slots at the end of the header,
+         * remove them so that this space can also be reclaimed.
+         * Remember that you cannot remove an empty slot if it is followed by one or more non-empty slots.
+         */
+
+        //1.检验这个slot的tuple是否已经被占用,判断是否是脏页
+        int slotValue = getSlotValue(dbPage, slot);
+
+
+        //2.如果占用，就不能删除
+
+        //3.不占用，删除，调用deleteTupleDataRange()
+        deleteTupleDataRange(dbPage,slot,1);
+        setSlotValue(dbPage,slot,EMPTY_SLOT);
+        //4.设置slot为Empty_SLOT value
+
+        //5.看是否有空格在末尾
+
+        //6.检验规范性
+
     }
 }

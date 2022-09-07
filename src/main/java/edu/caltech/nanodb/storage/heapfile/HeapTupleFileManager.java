@@ -17,6 +17,8 @@ import edu.caltech.nanodb.storage.StorageManager;
 import edu.caltech.nanodb.storage.TupleFile;
 import edu.caltech.nanodb.storage.TupleFileManager;
 
+import java.io.File;
+
 
 /**
  * This class provides high-level operations on heap tuple files.
@@ -71,7 +73,7 @@ public class HeapTupleFileManager implements TupleFileManager {
         //新建HeapTupleFile对象
         HeapTupleFile tupleFile = new HeapTupleFile(storageManager, this,
             dbFile, schema, stats);
-        //数据保存到tupleFile
+        //数据写到db的page里
         saveMetadata(tupleFile);
         return tupleFile;
     }
@@ -121,7 +123,9 @@ public class HeapTupleFileManager implements TupleFileManager {
 
         // Table schema is stored into the header page, so get it and prepare
         // to write out the schema information.
+        //从db文件里面读出一页，变成headerpage对象，填充这个page页面
         DBPage headerPage = storageManager.loadDBPage(dbFile, 0);
+        //这个写的是真正的数据
         PageWriter hpWriter = new PageWriter(headerPage);
         // Skip past the page-size value.
         //固定长度
@@ -150,10 +154,18 @@ public class HeapTupleFileManager implements TupleFileManager {
     public void deleteTupleFile(TupleFile tupleFile) {
         // TODO
         /**
-         * 有三件事要做：
-         * 1.删除
+         * 有2件事要做：
+         * 1.删除tuplefile
+         * 2.删除内存中的page
          */
+        //1.拉出一个页面，并且清空，后面会写回内存
+        DBFile dbFile = tupleFile.getDBFile();
 
-        throw new UnsupportedOperationException("NYI:  deleteTupleFile()");
+        DBPage dbPage = storageManager.loadDBPage(dbFile, 0);
+
+        dbPage.setDataRange(3, dbPage.getPageSize() - 3, (byte) 0);
+        dbPage.setDirty(true);
+        //删了tuplefile
+        tupleFile = null;
     }
 }

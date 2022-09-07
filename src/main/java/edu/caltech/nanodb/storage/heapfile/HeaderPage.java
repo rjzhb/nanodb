@@ -71,6 +71,7 @@ public class HeaderPage {
 
 
     /**
+     *确定是不是HeaderPage
      * This helper method simply verifies that the data page provided to the
      * <tt>HeaderPage</tt> class is in fact a header-page (i.e. page 0 in the
      * data file).
@@ -93,6 +94,7 @@ public class HeaderPage {
 
 
     /**
+     * 获得元数据的size
      * Returns the number of bytes that the table's schema occupies for storage
      * in the header page.
      *
@@ -106,6 +108,7 @@ public class HeaderPage {
 
 
     /**
+     * 设置元数据size
      * Sets the number of bytes that the table's schema occupies for storage
      * in the header page.
      *
@@ -125,6 +128,7 @@ public class HeaderPage {
 
 
     /**
+     * 获得数据的size
      * Returns the number of bytes that the table's statistics occupy for
      * storage in the header page.
      *
@@ -138,6 +142,7 @@ public class HeaderPage {
 
 
     /**
+     * 设置
      * Sets the number of bytes that the table's statistics occupy for storage
      * in the header page.
      *
@@ -157,6 +162,7 @@ public class HeaderPage {
 
 
     /**
+     * 获得statistic的offset
      * Returns the offset in the header page that the table statistics start at.
      * This value changes because the table schema resides before the stats, and
      * therefore the stats don't live at a fixed location.
