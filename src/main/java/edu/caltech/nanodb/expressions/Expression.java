@@ -7,6 +7,7 @@ import edu.caltech.nanodb.queryast.SelectClause;
 import edu.caltech.nanodb.relations.ColumnInfo;
 import edu.caltech.nanodb.relations.Schema;
 import edu.caltech.nanodb.relations.SchemaNameException;
+import edu.caltech.nanodb.relations.Tuple;
 
 
 /**
@@ -166,8 +167,12 @@ public abstract class Expression implements Cloneable {
      */
     public boolean evaluatePredicate(Environment env) throws ExpressionException {
         Object result = evaluate(env);
-        if (result == null)
-            return false;   // TODO:  This is UNKNOWN, not FALSE.
+        if (result == null) {
+            for (Tuple currentTuple : env.getCurrentTuples()) {
+                currentTuple.unpin();
+            }
+            return false;
+        }// TODO:  This is UNKNOWN, not FALSE.
         else
             return TypeConverter.getBooleanValue(result);
     }

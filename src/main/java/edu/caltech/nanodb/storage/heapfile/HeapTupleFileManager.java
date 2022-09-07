@@ -98,6 +98,7 @@ public class HeapTupleFileManager implements TupleFileManager {
         // Read in the statistics.
         TableStats stats = StatsWriter.readTableStats(hpReader, schema);
 
+        headerPage.unpin();
         return new HeapTupleFile(storageManager, this, dbFile, schema, stats);
     }
 
@@ -147,6 +148,7 @@ public class HeapTupleFileManager implements TupleFileManager {
         StatsWriter.writeTableStats(schema, stats, hpWriter);
         int statsSize = hpWriter.getPosition() - schemaEndPos;
         HeaderPage.setStatsSize(headerPage, statsSize);
+        headerPage.unpin();
     }
 
 
@@ -167,5 +169,6 @@ public class HeapTupleFileManager implements TupleFileManager {
         dbPage.setDirty(true);
         //删了tuplefile
         tupleFile = null;
+        dbPage.unpin();
     }
 }

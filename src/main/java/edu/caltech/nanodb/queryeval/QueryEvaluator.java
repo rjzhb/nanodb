@@ -39,10 +39,12 @@ public class QueryEvaluator {
                 if (tuple == null)
                     break;
 
+                tuple.pin();
                 rowsProduced++;
 
                 // Do whatever we're supposed to do with the tuple
                 processor.process(tuple);
+                tuple.unpin();
             }
         }
         finally {
@@ -53,7 +55,7 @@ public class QueryEvaluator {
 
         long elapsedTimeNanos = System.nanoTime() - startTime;
 
-        // Return the basic statistics we gathered.
+        // Return the basic statistics we gathered. 遍历的行数 + 时间
         return new EvalStats(rowsProduced, elapsedTimeNanos);
     }
 }
