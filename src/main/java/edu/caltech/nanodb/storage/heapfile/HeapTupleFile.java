@@ -278,7 +278,6 @@ page_scan:  // So we can break out of the outer loop from inside the inner loop.
             nextSlot = 0;
         }
 
-        dbPage.unpin();
         return nextTup;
     }
 

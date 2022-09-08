@@ -29,7 +29,6 @@ public class DataPage {
      */
     private static Logger logger = LogManager.getLogger(DataPage.class);
 
-
     /**
      * The offset in the data page where the number of slots in the slot table
      * is stored.
@@ -341,6 +340,7 @@ public class DataPage {
                 prevOffset = offset;
             }
         }
+
     }
 
 
