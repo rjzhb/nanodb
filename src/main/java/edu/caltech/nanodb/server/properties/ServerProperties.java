@@ -104,5 +104,5 @@ public interface ServerProperties {
      * overridden in the configuration.
      */
     public static final String DEFAULT_PLANNER_CLASS =
-        "edu.caltech.nanodb.queryeval.SimplestPlanner";
+        "edu.caltech.nanodb.queryeval.SimplePlanner";
 }
