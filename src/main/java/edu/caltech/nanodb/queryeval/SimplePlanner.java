@@ -3,6 +3,10 @@ package edu.caltech.nanodb.queryeval;
 
 import java.util.List;
 
+import edu.caltech.nanodb.expressions.Null;
+import edu.caltech.nanodb.plannodes.*;
+import edu.caltech.nanodb.relations.JoinType;
+import edu.caltech.nanodb.storage.heapfile.HeapTupleFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,10 +14,6 @@ import edu.caltech.nanodb.queryast.FromClause;
 import edu.caltech.nanodb.queryast.SelectClause;
 
 import edu.caltech.nanodb.expressions.Expression;
-
-import edu.caltech.nanodb.plannodes.FileScanNode;
-import edu.caltech.nanodb.plannodes.PlanNode;
-import edu.caltech.nanodb.plannodes.SelectNode;
 
 import edu.caltech.nanodb.relations.TableInfo;
 import edu.caltech.nanodb.storage.StorageManager;
@@ -28,15 +28,21 @@ import edu.caltech.nanodb.storage.StorageManager;
  */
 public class SimplePlanner implements Planner {
 
-    /** A logging object for reporting anything interesting that happens. */
+    /**
+     * A logging object for reporting anything interesting that happens.
+     */
     private static Logger logger = LogManager.getLogger(SimplestPlanner.class);
 
 
-    /** The storage manager used during query planning. */
+    /**
+     * The storage manager used during query planning.
+     */
     protected StorageManager storageManager;
 
 
-    /** Sets the server to be used during query planning. */
+    /**
+     * Sets the server to be used during query planning.
+     */
     public void setStorageManager(StorageManager storageManager) {
         if (storageManager == null)
             throw new IllegalArgumentException("storageManager cannot be null");
@@ -44,13 +50,52 @@ public class SimplePlanner implements Planner {
         this.storageManager = storageManager;
     }
 
+    public PlanNode makePlan(FromClause fromClause) {
+        PlanNode planNode = null;
+        switch (fromClause.getClauseType()) {
+            case JOIN_EXPR:
+                planNode = makeNestedJoinNodePlan(fromClause, null);
+                break;
+            case SELECT_SUBQUERY:
+                planNode = makeSimpleSelect(fromClause.getTableName(), fromClause.getSelectClause().getWhereExpr(), null);
+                break;
+            case BASE_TABLE:
+                TableInfo tableInfo = storageManager.getTableManager().openTable(fromClause.getTableName());
+                planNode = new FileScanNode(tableInfo, null);
+                break;
+        }
+        if (planNode != null) {
+            planNode.prepare();
+        }
+        return planNode;
+
+    }
+
+
+    public PlanNode makeNestedJoinNodePlan(FromClause fromClause, SelectClause selectClause) {
+        assert (fromClause.isJoinExpr());
+        FromClause leftChild = fromClause.getLeftChild();
+        FromClause rightChild = fromClause.getRightChild();
+
+        PlanNode leftNode = null;
+        PlanNode rightNode = null;
+        if (leftChild != null) {
+            leftNode = makePlan(leftChild);
+        }
+        if (rightChild != null) {
+            rightNode = makePlan(rightChild);
+        }
+
+        NestedLoopJoinNode nestedLoopJoinNode = new NestedLoopJoinNode(leftNode, rightNode, JoinType.CROSS, selectClause.getWhereExpr());
+
+        return nestedLoopJoinNode;
+    }
 
     /**
      * Returns the root of a plan tree suitable for executing the specified
      * query.
      *
      * @param selClause an object describing the query to be performed
-     *
      * @return a plan tree for executing the specified query
      */
     @Override
@@ -66,16 +111,44 @@ public class SimplePlanner implements Planner {
                     "Not implemented:  enclosing queries");
         }
 
-        if (!selClause.isTrivialProject()) {
-            throw new UnsupportedOperationException(
-                    "Not implemented:  project");
-        }
 
         FromClause fromClause = selClause.getFromClause();
-        if (!fromClause.isBaseTable()) {
-            throw new UnsupportedOperationException(
-                    "Not implemented:  joins or subqueries in FROM clause");
+        if (!selClause.isTrivialProject()) {
+            //常量折叠
+            if (fromClause == null) {
+                ProjectNode projectNode = new ProjectNode(null, selClause.getSelectValues());
+                projectNode.prepare();
+
+                return projectNode;
+            }
+
+            if (!fromClause.isBaseTable()) {
+                if (fromClause.isJoinExpr()) {
+                    PlanNode planNode = makeNestedJoinNodePlan(fromClause, selClause);
+                    planNode.prepare();
+
+                    return planNode;
+                }
+            }
+
+            SelectNode leftChild = makeSimpleSelect(fromClause.getTableName(), selClause.getWhereExpr(), null);
+
+            ProjectNode projectNode = new ProjectNode(leftChild, selClause.getSelectValues());
+            projectNode.prepare();
+
+            return projectNode;
         }
+
+        if (!fromClause.isBaseTable()) {
+            //先实现普通的join
+            if (fromClause.isJoinExpr()) {
+                PlanNode planNode = makeNestedJoinNodePlan(fromClause, selClause);
+                planNode.prepare();
+
+                return planNode;
+            }
+        }
+
 
         return makeSimpleSelect(fromClause.getTableName(),
                 selClause.getWhereExpr(), null);
@@ -94,10 +167,8 @@ public class SimplePlanner implements Planner {
      * page data.
      *
      * @param tableName The name of the table that is being selected from.
-     *
      * @param predicate An optional selection predicate, or {@code null} if
-     *        no filtering is desired.
-     *
+     *                  no filtering is desired.
      * @return A new plan-node for evaluating the select operation.
      */
     public SelectNode makeSimpleSelect(String tableName, Expression predicate,
@@ -124,5 +195,6 @@ public class SimplePlanner implements Planner {
         selectNode.prepare();
         return selectNode;
     }
+
 }
 

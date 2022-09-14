@@ -79,7 +79,8 @@ public class ProjectNode extends PlanNode {
      *                       input tuples.
      */
     public ProjectNode(PlanNode leftChild, List<SelectValue> projectionSpec) {
-        super(leftChild);
+        super();
+        this.leftChild = leftChild;
         this.projectionSpec = projectionSpec;
         updateTrivialFlag();
     }
@@ -363,6 +364,7 @@ public class ProjectNode extends PlanNode {
             nonWildcardColumnInfos.iterator();
 
         for (SelectValue selVal : projectionSpec) {
+            //有通配符
             if (selVal.isWildcard()) {
                 // This value is a wildcard.  Find the columns that match the
                 // wildcard, then add their values one by one.
@@ -370,6 +372,7 @@ public class ProjectNode extends PlanNode {
                 // Wildcard expressions cannot rename their results.
 
                 ColumnName wildcard = selVal.getWildcard();
+                //通配符是对具体的table
                 if (wildcard.isTableSpecified()) {
                     // Need to find all columns that are associated with the
                     // specified table.
@@ -379,13 +382,13 @@ public class ProjectNode extends PlanNode {
 
                     for (int iCol : matchCols.keySet())
                         newTuple.addValue(tuple.getColumnValue(iCol));
-                }
+                }//不是具体的table
                 else {
                     // No table is specified, so this is all columns in the
                     // child schema.
                     newTuple.appendTuple(tuple);
                 }
-            }
+            }//无通配符
             else if (selVal.isExpression()) {
                 // This value is a simple expression.
                 Expression expr = selVal.getExpression();
@@ -403,7 +406,7 @@ public class ProjectNode extends PlanNode {
                 // Add the result to the tuple.
 
                 /*
-                if (alias != null)
+                if (alias != nul.l)
                     colInfo = new ColumnInfo(alias, colInfo.getType());
 
                 logger.debug(String.format(

@@ -4,6 +4,7 @@ package edu.caltech.nanodb.plannodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.caltech.nanodb.storage.DBFileReader;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -21,18 +22,26 @@ import edu.caltech.nanodb.relations.Tuple;
  * arbitrary join conditions but is also the slowest join implementation.
  */
 public class NestedLoopJoinNode extends ThetaJoinNode {
-    /** A logging object for reporting anything interesting that happens. */
+    /**
+     * A logging object for reporting anything interesting that happens.
+     */
     private static Logger logger = LogManager.getLogger(NestedLoopJoinNode.class);
 
 
-    /** Most recently retrieved tuple of the left relation. */
+    /**
+     * Most recently retrieved tuple of the left relation.
+     */
     private Tuple leftTuple;
 
-    /** Most recently retrieved tuple of the right relation. */
+    /**
+     * Most recently retrieved tuple of the right relation.
+     */
     private Tuple rightTuple;
 
 
-    /** Set to true when we have exhausted all tuples from our subplans. */
+    /**
+     * Set to true when we have exhausted all tuples from our subplans.
+     */
     private boolean done;
 
 
@@ -56,15 +65,17 @@ public class NestedLoopJoinNode extends ThetaJoinNode {
             NestedLoopJoinNode other = (NestedLoopJoinNode) obj;
 
             return predicate.equals(other.predicate) &&
-                leftChild.equals(other.leftChild) &&
-                rightChild.equals(other.rightChild);
+                    leftChild.equals(other.leftChild) &&
+                    rightChild.equals(other.rightChild);
         }
 
         return false;
     }
 
 
-    /** Computes the hash-code of the nested-loop plan node. */
+    /**
+     * Computes the hash-code of the nested-loop plan node.
+     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -128,19 +139,25 @@ public class NestedLoopJoinNode extends ThetaJoinNode {
     }
 
 
-    /** True if the node supports position marking. **/
+    /**
+     * True if the node supports position marking.
+     **/
     public boolean supportsMarking() {
         return leftChild.supportsMarking() && rightChild.supportsMarking();
     }
 
 
-    /** True if the node requires that its left child supports marking. */
+    /**
+     * True if the node requires that its left child supports marking.
+     */
     public boolean requiresLeftMarking() {
         return false;
     }
 
 
-    /** True if the node requires that its right child supports marking. */
+    /**
+     * True if the node requires that its right child supports marking.
+     */
     public boolean requiresRightMarking() {
         return false;
     }
@@ -193,11 +210,22 @@ public class NestedLoopJoinNode extends ThetaJoinNode {
      * and {@link #rightTuple} based on the nested-loops logic.
      *
      * @return {@code true} if another pair of tuples was found to join, or
-     *         {@code false} if no more pairs of tuples are available to join.
+     * {@code false} if no more pairs of tuples are available to join.
      */
     private boolean getTuplesToJoin() {
-        // TODO:  Implement
-        return false;
+        if ((leftTuple = leftChild.getNextTuple()) == null) {
+            done = true;
+            return false;
+        }
+
+        boolean init = false;
+        if ((rightTuple = rightChild.getNextTuple()) == null) {
+            rightChild = planNodeClone.rightChild;
+            init = true;
+        }
+
+        return !init || (rightTuple = rightChild.getNextTuple()) != null;
+
     }
 
 

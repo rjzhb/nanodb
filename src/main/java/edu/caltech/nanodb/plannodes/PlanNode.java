@@ -72,6 +72,7 @@ public abstract class PlanNode implements Cloneable {
      */
     protected PlanNode rightChild;
 
+    protected PlanNode planNodeClone;
 
     /**
      * The schema of the results produced by this plan-node.  The schema is
@@ -317,6 +318,11 @@ public abstract class PlanNode implements Cloneable {
      */
     public void initialize() {
         // Do nothing.
+        try {
+            planNodeClone = clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
